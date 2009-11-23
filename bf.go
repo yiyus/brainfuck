@@ -18,6 +18,10 @@
 		] 	if the byte at the data pointer is nonzero, then instead of moving the instruction
 			pointer forward to the next command, jump it back to the command after the
 			matching [ command*.
+
+	ToDo: Implement Read/Write methods as an alternative to channels
+
+	See also: http://golang.org/test/turing.go (many thanks to the author of this code!)
 */
 
 package brainfuck
