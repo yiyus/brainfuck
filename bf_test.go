@@ -17,7 +17,7 @@ func TestHelloWorld(t *testing.T) {
 		>.+++.------.--------.>+.>.!");
 	bf := BrainFucker(prog, 30000);
 	for {
-		b, ok := <-bf.out;
+		b, ok := <-bf.Out;
 		if !ok {
 			return;
 		}
@@ -31,14 +31,14 @@ func TestAddition(t *testing.T) {
 	bi := "43";
 	i := 0;
 	for {
-		b, oki := <-bf.out;
+		oki := i<len(bi);
 		if oki {
-			fmt.Print(string(b));
-		}
-		oko := i<len(bi);
-		if oko {
-			bf.in <- bi[i];
+			bf.In <- bi[i];
 			i++;
+		}
+		b, oko := <-bf.Out;
+		if oko {
+			fmt.Print(string(b));
 		}
 		if !oki && !oko {
 			break;

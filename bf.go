@@ -28,8 +28,8 @@ package brainfuck
 
 // BrainFuckVM represents the input and output of the virtual machine
 type BrainFuckVM struct {
-	in	chan byte;
-	out	chan byte;
+	In	chan byte;
+	Out	chan byte;
 }
 
 func (bf BrainFuckVM) core(prog []byte, size int) {
@@ -50,10 +50,10 @@ func (bf BrainFuckVM) core(prog []byte, size int) {
 		case '-':
 			a[p]--
 		case '.':
-			bf.out <- a[p]
+			bf.Out<- a[p]
 		case ',':
 			// test/turing.go cannot do this!
-			a[p] = <-bf.in
+			a[p] = <-bf.In
 		case '[':
 			if a[p] == 0 {
 				for nest := 1; nest > 0; pc++ {
@@ -89,8 +89,8 @@ func (bf BrainFuckVM) core(prog []byte, size int) {
 // access to its I/O ports
 func BrainFucker(prog []byte, size int) *BrainFuckVM {
 	bf := new(BrainFuckVM);
-	bf.in = make(chan byte);
-	bf.out = make(chan byte);
+	bf.In = make(chan byte);
+	bf.Out= make(chan byte);
 	go bf.core(prog, size);
 	return bf;
 }
