@@ -1,7 +1,7 @@
 include $(GOROOT)/src/Make.inc
 
 TARG=brainfuck
-GOFILES=bf.go
+GOFILES=brainfuck.go
 
 include $(GOROOT)/src/Make.pkg
 
