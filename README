@@ -1,0 +1,6 @@
+brainfuck.go:
+	brainfuck vm go package (compile with 'gomake')
+main.go:
+	simple brainfuck interpreter (compile with 'gomake bf')
+
+by: yiyu.jgl@gmail.com (2010)
