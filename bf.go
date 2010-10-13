@@ -19,22 +19,30 @@
 			pointer forward to the next command, jump it back to the command after the
 			matching [ command*.
 
-	ToDo: Implement Read/Write methods as an alternative to channels
-
 	See also: http://golang.org/test/turing.go (many thanks to the author of this code!)
 */
 
 package brainfuck
 
-// A VM is a brainfuck virtual machine
+import(
+	"io"
+	"os"
+)
+
+// A VM is a brainfuck virtual machine.
+// The Err chanel can be read once the program
+// finishes. A nil value means the program run
+// sucessfully, other os.Error value is an io error.
 type VM struct {
-	In  chan byte
-	Out chan byte
+	Err	chan os.Error
+	in	io.Reader
+	out	io.Writer
+	size	int
 }
 
-func (bf VM) run(prog []byte, size int) {
-	a := make([]byte, size)
-	if len(prog) == 0 || size == 0 {
+func (vm VM) run(prog string) {
+	a := make([]byte, vm.size)
+	if len(prog) == 0 || vm.size == 0 {
 		return
 	}
 	p := 0
@@ -50,10 +58,14 @@ func (bf VM) run(prog []byte, size int) {
 		case '-':
 			a[p]--
 		case '.':
-			bf.Out <- a[p]
+			if _, err := vm.out.Write(a[p:p + 1]); err != nil {
+				vm.Err <- err
+			}
 		case ',':
 			// test/turing.go cannot do this!
-			a[p] = <-bf.In
+			if _, err := vm.in.Read(a[p:p + 1]); err != nil {
+				vm.Err <- err
+			}
 		case '[':
 			if a[p] == 0 {
 				for nest := 1; nest > 0; pc++ {
@@ -79,17 +91,16 @@ func (bf VM) run(prog []byte, size int) {
 		}
 		pc++
 		if pc == len(prog) {
+			vm.Err <- nil
 			return
 		}
 	}
 }
 
-// NewVM launchs a new virtual machine with the specified
-// program and memory and return a BrainFucker struct
-func NewVM(prog []byte, size int) *VM {
-	bf := new(VM)
-	bf.In = make(chan byte)
-	bf.Out = make(chan byte)
-	go bf.run(prog, size)
-	return bf
+// NewVM returns a new virtual machine running the specified program,
+// with the given memory size, reading from in and writting to out.
+func NewVM(prog string, size int, in io.Reader, out io.Writer) *VM {
+	vm := &VM{make(chan os.Error), in, out, size}
+	go vm.run(prog)
+	return vm
 }

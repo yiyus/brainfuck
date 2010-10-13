@@ -5,42 +5,23 @@
 package brainfuck
 
 import (
-	"fmt"
+	"strings"
+	"os"
 	"testing"
 )
 
 func TestHelloWorld(t *testing.T) {
-	prog := []byte(`
+	prog := `
 		++++++++++[>+++++++>++++++++++>+++>+<<<<-]
 		>++.>+.+++++++..+++.>++.<<+++++++++++++++.
-		>.+++.------.--------.>+.>.!`)
-	bf := NewVM(prog, 30000)
-	for {
-		b, ok := <-bf.Out
-		if !ok {
-			return
-		}
-		fmt.Print(string(b))
-	}
+		>.+++.------.--------.>+.>.!`
+	bf := NewVM(prog, 30000, nil, os.Stdout)
+	<-bf.Err
 }
 
 func TestAddition(t *testing.T) {
-	prog := []byte(`,>++++++[<-------->-],[<+>-]<.`)
-	bf := NewVM(prog, 30000)
-	bi := "43"
-	i := 0
-	for {
-		reading := i < len(bi)
-		if reading {
-			bf.In <- bi[i]
-			i++
-		}
-		b, writing := <-bf.Out
-		if writing {
-			fmt.Print(string(b))
-		}
-		if !reading && !writing {
-			break
-		}
-	}
+	prog := `,>++++++[<-------->-],[<+>-]<.`
+	in := strings.NewReader("43")
+	bf := NewVM(prog, 30000, in, os.Stdout)
+	<-bf.Err
 }
