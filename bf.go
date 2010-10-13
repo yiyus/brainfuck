@@ -26,19 +26,19 @@
 
 package brainfuck
 
-// BrainFuckVM represents the input and output of the virtual machine
-type BrainFuckVM struct {
-	In	chan byte;
-	Out	chan byte;
+// A VM is a brainfuck virtual machine
+type VM struct {
+	In  chan byte
+	Out chan byte
 }
 
-func (bf BrainFuckVM) core(prog []byte, size int) {
-	a := make([]byte, size);
+func (bf VM) run(prog []byte, size int) {
+	a := make([]byte, size)
 	if len(prog) == 0 || size == 0 {
 		return
 	}
-	p := 0;
-	pc := 0;
+	p := 0
+	pc := 0
 	for {
 		switch prog[pc] {
 		case '>':
@@ -50,7 +50,7 @@ func (bf BrainFuckVM) core(prog []byte, size int) {
 		case '-':
 			a[p]--
 		case '.':
-			bf.Out<- a[p]
+			bf.Out <- a[p]
 		case ',':
 			// test/turing.go cannot do this!
 			a[p] = <-bf.In
@@ -77,20 +77,19 @@ func (bf BrainFuckVM) core(prog []byte, size int) {
 				}
 			}
 		}
-		pc++;
+		pc++
 		if pc == len(prog) {
 			return
 		}
 	}
 }
 
-// BrainFucker launchs a new virtual machine with the specified
-// program and memory and return a BrainFuckVM struct to
-// access to its I/O ports
-func BrainFucker(prog []byte, size int) *BrainFuckVM {
-	bf := new(BrainFuckVM);
-	bf.In = make(chan byte);
-	bf.Out= make(chan byte);
-	go bf.core(prog, size);
-	return bf;
+// NewVM launchs a new virtual machine with the specified
+// program and memory and return a BrainFucker struct
+func NewVM(prog []byte, size int) *VM {
+	bf := new(VM)
+	bf.In = make(chan byte)
+	bf.Out = make(chan byte)
+	go bf.run(prog, size)
+	return bf
 }

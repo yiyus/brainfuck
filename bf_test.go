@@ -5,45 +5,42 @@
 package brainfuck
 
 import (
-    "fmt";
-    "strings";
-    "testing";
+	"fmt"
+	"testing"
 )
 
 func TestHelloWorld(t *testing.T) {
-	prog := strings.Bytes("\
-		++++++++++[>+++++++>++++++++++>+++>+<<<<-]\
-		>++.>+.+++++++..+++.>++.<<+++++++++++++++.\
-		>.+++.------.--------.>+.>.!");
-	bf := BrainFucker(prog, 30000);
+	prog := []byte(`
+		++++++++++[>+++++++>++++++++++>+++>+<<<<-]
+		>++.>+.+++++++..+++.>++.<<+++++++++++++++.
+		>.+++.------.--------.>+.>.!`)
+	bf := NewVM(prog, 30000)
 	for {
-		b, ok := <-bf.Out;
+		b, ok := <-bf.Out
 		if !ok {
-			return;
+			return
 		}
-		fmt.Print(string(b));
+		fmt.Print(string(b))
 	}
 }
 
 func TestAddition(t *testing.T) {
-	prog := strings.Bytes(",>++++++[<-------->-],[<+>-]<.");
-	bf := BrainFucker(prog, 30000);
-	bi := "43";
-	i := 0;
+	prog := []byte(`,>++++++[<-------->-],[<+>-]<.`)
+	bf := NewVM(prog, 30000)
+	bi := "43"
+	i := 0
 	for {
-		oki := i<len(bi);
-		if oki {
-			bf.In <- bi[i];
-			i++;
+		reading := i < len(bi)
+		if reading {
+			bf.In <- bi[i]
+			i++
 		}
-		b, oko := <-bf.Out;
-		if oko {
-			fmt.Print(string(b));
+		b, writing := <-bf.Out
+		if writing {
+			fmt.Print(string(b))
 		}
-		if !oki && !oko {
-			break;
+		if !reading && !writing {
+			break
 		}
 	}
 }
-
-
