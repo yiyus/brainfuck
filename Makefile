@@ -3,7 +3,12 @@ include $(GOROOT)/src/Make.inc
 TARG=brainfuck
 GOFILES=brainfuck.go
 
+CLEANFILES+=bf
+
 include $(GOROOT)/src/Make.pkg
 
-bf: main.go package
-	$(GC) main.go && $(LD) -o $@ main.$O
+main.$O: main.go package
+	$(GC) -I_obj $<
+
+bf: main.$O
+	$(LD) -L_obj -o $@ $<
